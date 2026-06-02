@@ -1,53 +1,50 @@
-# Finclaro — AI Financial Research Assistant
+# Full-Stack AI App Template
 
-A production-grade RAG-powered financial research assistant built with FastAPI, Next.js, and Supabase.
+A reusable full-stack AI app template built with FastAPI, Next.js, and Supabase.
 
 ## Stack
 
-- **Frontend** — Next.js 16, TypeScript, Tailwind CSS, deployed on Vercel
-- **Backend** — Python FastAPI, deployed on Railway
+- **Frontend** — Next.js 16, TypeScript, Tailwind CSS
+- **Backend** — Python FastAPI
 - **Database** — PostgreSQL + pgvector via Supabase
 - **Auth** — Supabase Auth
-- **LLMs** — OpenRouter (completions) + OpenAI (embeddings)
+- **LLMs** — OpenRouter (chat/completions) + OpenAI (embeddings)
 - **Email** — Resend
-- **News** — NewsAPI
+- **Ingestion** — Example NewsAPI ingestion pipeline
 
 ## Architecture
-```
+
+```text
 User → Next.js Frontend → FastAPI Backend → Supabase (pgvector)
-                                          → OpenRouter (LLM)
-                                          → OpenAI (embeddings)
-                                          → Resend (email)
-                                          → NewsAPI (news)
+                                          → LLM provider(s)
+                                          → Embedding provider(s)
+                                          → Optional email + ingestion services
 ```
 
-## Setup
+## Quick Start
 
-### 1. Clone the repo
+### 1. Clone
+
 ```bash
-git clone https://github.com/yourusername/finclaro.git
-cd finclaro
+git clone https://github.com/<your-org>/full-stack-ai-app-template.git
+cd full-stack-ai-app-template
 ```
 
-### 2. Set up Supabase
+### 2. Backend setup
 
-1. Create a new project at supabase.com
-2. Go to SQL Editor and run `backend/migrations/001_initial.sql`
-3. Enable the pgvector extension: Extensions → search "vector" → enable
-4. Copy your project URL and anon key
-
-### 3. Set up backend
 ```bash
 cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
+cp .env.example.yaml .env
+# (this example file is in KEY=VALUE format)
 # Fill in your .env values
 uvicorn api.main:app --reload
 ```
 
-### 4. Set up frontend
+### 3. Frontend setup
+
 ```bash
 cd frontend
 npm install
@@ -56,78 +53,51 @@ cp .env.example .env.local
 npm run dev
 ```
 
-### 5. Seed initial data
+### 4. Database setup
+
+1. Create a Supabase project.
+2. Run `backend/migrations/001_initial.sql` in Supabase SQL Editor.
+3. Enable the `vector` extension.
+
+### 5. Optional seed/ingestion
+
 ```bash
-# Fetch and embed initial news articles
 curl -X POST http://localhost:8000/ingest
 ```
 
-## Key Features
+## Key Template Features
 
-- **RAG Pipeline** — semantic search over financial news with recency reranking
-- **Morning Digest** — personalised daily email based on user topic preferences
-- **Watchlist Digest** — weekly email summarising news for tracked stocks and topics
-- **Chat History** — all questions and answers saved per user
-- **Waitlist** — invite-only access with waitlist signup
+- Retrieval-Augmented Generation (RAG) pipeline
+- Embedding + vector search flow
+- Scheduled digest/email agent examples
+- Auth-ready frontend/backend structure
+- Dockerfiles and deployment-ready layout for frontend + backend
 
 ## Project Structure
-```
-finclaro/
+
+```text
+full-stack-ai-app-template/
 ├── backend/
 │   ├── api/
-│   │   └── main.py              # FastAPI app, routes, scheduler
-│   ├── ingestion/
-│   │   └── news_fetcher.py      # NewsAPI ingestion
-│   ├── pipelines/
-│   │   ├── embedding_pipeline.py # OpenAI embeddings
-│   │   └── rag_pipeline.py       # Retrieval and generation
 │   ├── agents/
-│   │   ├── digest_agent.py       # Morning digest
-│   │   └── watchlist_digest_agent.py # Weekly watchlist digest
-│   ├── services/
-│   │   └── llm_client.py         # LLM facade (OpenRouter + OpenAI)
+│   ├── db/
+│   ├── ingestion/
 │   ├── migrations/
-│   │   └── 001_initial.sql       # Database schema
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── .env.example
+│   ├── pipelines/
+│   ├── services/
+│   └── requirements.txt
 ├── frontend/
 │   ├── app/
-│   │   ├── page.tsx              # Landing page
-│   │   ├── login/page.tsx        # Login + waitlist
-│   │   ├── dashboard/page.tsx    # Chat interface
-│   │   ├── watchlist/page.tsx    # Watchlist management
-│   │   └── settings/page.tsx     # Digest preferences
 │   ├── lib/
-│   │   └── supabase.ts           # Supabase client
-│   ├── Dockerfile
-│   └── .env.example
+│   └── package.json
 └── README.md
 ```
 
-## Deployment
+## Customizing This Template
 
-### Backend — Railway
+To adapt this template for your domain:
 
-1. Connect GitHub repo to Railway
-2. Set root directory to `backend`
-3. Add environment variables from `.env.example`
-4. Railway auto-deploys on push
-
-### Frontend — Vercel
-
-1. Connect GitHub repo to Vercel
-2. Set root directory to `frontend`
-3. Add environment variables from `.env.example`
-4. Vercel auto-deploys on push
-
-## Extending This Template
-
-This repo is designed as a reusable RAG template. To adapt for a new domain:
-
-1. Update `ingestion/news_fetcher.py` — change data sources and queries
-2. Update `pipelines/rag_pipeline.py` — adjust the prompt for your domain
-3. Update `agents/digest_agent.py` — customise digest format and topics
-4. Update frontend pages — change copy and UI for your use case
-
-The core RAG pipeline, auth, scheduling, and email infrastructure stays the same.
+1. Replace ingestion sources (`backend/ingestion/`).
+2. Update retrieval and prompt logic (`backend/pipelines/rag_pipeline.py`).
+3. Customize agent behavior (`backend/agents/`).
+4. Update frontend routes/components and branding (`frontend/app/`).
