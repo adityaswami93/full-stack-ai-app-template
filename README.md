@@ -38,6 +38,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example.yaml .env
+# (this example file is in KEY=VALUE format)
 # Fill in your .env values
 uvicorn api.main:app --reload
 ```
